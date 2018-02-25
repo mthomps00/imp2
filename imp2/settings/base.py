@@ -19,16 +19,16 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'l0^40gu)c6bq0jpb#crc68mdof@%z6xn1-m7(w^v7(c+&o8ajt'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = [
-    'imp2-mthomps.c9users.io',
-]
-
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'imp_dev2',                      # Or path to database file if using sqlite3.
+        'USER': 'mthomps_rsvp',                      # Not used with sqlite3.
+        'PASSWORD': '21406d16',                  # Not used with sqlite3.
+        'HOST': 'web516.webfaction.com',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '5432',                      # Set to empty string for default. Not used with sqlite3.
+    }
+}
 
 # Application definition
 
@@ -74,17 +74,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'imp2.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/2.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
-
-
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
 
@@ -122,9 +111,3 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
-
-try:
-    from local_settings import *
-except ImportError:
-    # No local settings was found, skipping.
-    pass
