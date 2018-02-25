@@ -47,7 +47,7 @@ class Camp(models.Model):
     mailchimp_list = models.CharField(max_length=140, blank=True)
     mailchimp_code = models.CharField(max_length=5, blank=True, null=True, unique=True)
     
-    def __unicode__(self):
+    def __str__(self):
         return self.display_name
 
 class Invitation(models.Model):
@@ -106,7 +106,7 @@ class Invitation(models.Model):
         help_text='Check here if you\'ve taken care of your hotel room.'
     )
     
-    def __unicode__(self):
+    def __str__(self):
         return u'%s Invite: %s %s (%s)' % (self.camp, self.user.first_name, self.user.last_name, self.user.username)
         
     def is_waitlisted(self):
