@@ -1,0 +1,34 @@
+{% extends "form_holder.html" %}
+{% load widget_tweaks %}
+
+{% block maincrumb %}{% endblock %}
+
+{% block breadcrumb %}Log in to SCIM{% endblock %}
+
+{% block form %}
+{% if form.errors %}
+<p class="text-large orange">Your username and password didn't match. Please try again.</p>
+{% endif %}
+<div class="post-script-mod">
+    <h3 class="overline-alt">Log in here.</h3>
+    <em class="post-script">If you're not one of the Spark Camp organizers, you must have found your way here accidentally. Right? Yes, we thought so. Just press the back button, and nobody gets hurt. We haven't recorded your name or anything, and we won't take any action if you should <strong>accidentally</strong> find yourself here again. Spark Camp crew, you can go ahead and enter the code below.</em>
+</div>
+
+<section class="content">
+<form class="comment-form form-basic" method="post" action=".">
+
+{% csrf_token %}
+<fieldset class="inputs">
+	{{ form.username.label_tag }}
+	{{ form.username|add_class:"input"|attr:"placeholder:Username" }}
+</fieldset>
+<fieldset class="inputs">
+    {{ form.password.label_tag }}
+    {{ form.password|add_class:"input"|attr:"placeholder:Password" }}
+</fieldset>
+
+<input class="submit btn-large" type="submit" value="login" />
+<input type="hidden" name="next" value="{{ next }}" />
+</section>
+</form>
+{% endblock %}

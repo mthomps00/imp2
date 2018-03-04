@@ -140,7 +140,7 @@ class Invitation(models.Model):
         super(Invitation, self).save(*args, **kwargs) # Call the "real" save() method.
 
 class Stipend(models.Model):
-    invitation = models.OneToOneField(Invitation, on_delete=models.CASCADE)
+    invitation = models.OneToOneField(Invitation, related_name='stipend', on_delete=models.CASCADE)
     SUBSIDY_CHOICES = (
         ('Y', 'Yes'),
         ('N', 'No'),
@@ -175,7 +175,7 @@ class Stipend(models.Model):
     )
 
 class Ignite(models.Model):
-    invitation = models.OneToOneField(Invitation, on_delete=models.CASCADE)
+    invitation = models.OneToOneField(Invitation, related_name='ignite', on_delete=models.CASCADE)
     EXPERIENCE_CHOICES = (
         ('Y', 'Yep, I\'m an Ignite pro.'),
         ('M', 'I think I\'ve done something similar.'),
@@ -190,7 +190,7 @@ class Ignite(models.Model):
     description = models.TextField(help_text='What\'s your talk about? Give us a little detail.')
     
 class Roommate(models.Model):
-    invitation = models.OneToOneField(Invitation, on_delete=models.CASCADE)
+    invitation = models.OneToOneField(Invitation, related_name='roommate', on_delete=models.CASCADE)
     SEX_CHOICES = (
         ('M', 'Male'),
         ('F', 'Female'),
@@ -219,7 +219,7 @@ class Roommate(models.Model):
     )
 
 class Session(models.Model):
-    invitation = models.OneToOneField(Invitation, on_delete=models.CASCADE)
+    invitation = models.OneToOneField(Invitation, related_name='session', on_delete=models.CASCADE)
     title = models.CharField(
         max_length=140,
         help_text='Suggest a name for this session'

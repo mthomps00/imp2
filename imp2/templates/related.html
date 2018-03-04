@@ -1,0 +1,15 @@
+{% extends "form_holder.html" %}
+
+{% block breadcrumb %}
+{{ main_object }}
+{% endblock %}
+
+{% block form %}
+<form class="well" action="{% url 'invite_related' rand_id=rand_id main_object=main_object %}" method="post">{% csrf_token %}
+<h3 class="h3">{{ main_object }} Form</h3><br />
+<table class="table table-basic">
+{{ form.as_table }}
+</table>
+    <input class="submit btn-large" type="submit" value="Submit" />
+</form>
+{% endblock %}

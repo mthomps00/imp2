@@ -1,0 +1,43 @@
+{% extends "single_camp.html" %}
+
+{% block title %}Stipend requests for Spark Camp {{ camp.theme }}{% endblock %}
+
+{% block pageheader %}{{ stipends|length }} stipend request{{ stipends|length|pluralize }} found{% endblock %}
+
+{% block content %}
+<section class="content">
+    {% if invitations %}
+        <table class="table table-basic" id="invites-table">
+            <thead>
+                <tr>
+                    <th>Invite No.</th>
+                    <th>First name</th>
+                    <th>Last name</th>
+                    <th>Cost estimate</th>
+                    <th>Subsidized?</th>
+                    <th>Employer %</th>
+                    <th>Invitee %</th>
+                </tr>
+            </thead>                        
+        {% for stipend in stipends %}
+            <tr>
+                <td><a href="{{ stipend.url }}">{{ stipend.rand_id }}</a></td>
+                <td>{{ stipend.first_name }}</td>
+                <td>{{ stipend.last_name }}</td>
+                <td>{{ stipend.cost_estimate }}</td>
+                <td>{{ stipend.employer_subsidized }}</td>
+                <td>{{ stipend.employer_percentage }}</td>
+                <td>{{ stipend.invitee_percentage }}</td>
+            </tr>
+            <tr class="expand-child">
+                <td>&nbsp;</td>
+                <td colspan="6">{{ stipend.details }}</td>
+            </tr>
+        {% endfor %}
+        </table>
+        
+    {% else %}
+        <p class="text-large">No stipend requests found.</p>
+    {% endif %}
+</section>
+{% endblock %}

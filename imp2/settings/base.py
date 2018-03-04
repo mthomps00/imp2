@@ -11,9 +11,26 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+import json
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# It's normally not recommended to import anything from Django directly into
+# settings, but ImproperlyConfigured is an exception.
+from django.core.exceptions import ImproperlyConfigured
+
+# JSON-based secrets module, per Two Scoops of Django
+with open(os.path.join(BASE_DIR, "settings/secrets.json")) as f:
+    secrets = json.loads(f.read())
+
+def get_secret(setting, secrets=secrets):
+    '''Get the secret variable or return explicit exception.'''
+    try:
+        return secrets[setting]
+    except KeyError:
+        error_msg = 'Set the {0} environment variable'.format(setting)
+        raise ImproperlyConfigured(error_msg)
 
 
 # Quick-start development settings - unsuitable for production
@@ -23,9 +40,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'imp_dev2',                      # Or path to database file if using sqlite3.
-        'USER': 'mthomps_rsvp',                      # Not used with sqlite3.
-        'PASSWORD': '21406d16',                  # Not used with sqlite3.
-        'HOST': 'web516.webfaction.com',                      # Set to empty string for localhost. Not used with sqlite3.
+        'USER': get_secret("DB_USER"),                      # Not used with sqlite3.
+        'PASSWORD': get_secret("DB_PASSWORD"),                  # Not used with sqlite3.
+        'HOST': get_secret("DB_HOST"),                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '5432',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
@@ -53,12 +70,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'imp2.urls'
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, "templates"),
+            ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -97,17 +114,23 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
-
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
 STATIC_URL = '/static/'
+
+# Miscellaneous variables
+
+ROOT_URLCONF = 'imp2.urls'
+SECRET_KEY = get_secret("SECRET_KEY")
+STRIPE_PUBLIC_KEY = get_secret("STRIPE_PUBLIC_KEY")
+STRIPE_SECRET_KEY = get_secret("STRIPE_SECRET_KEY")
+TEST_EMAIL = 'admin@sparkcamp.com'

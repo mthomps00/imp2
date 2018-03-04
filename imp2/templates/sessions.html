@@ -1,0 +1,36 @@
+{% extends "single_camp.html" %}
+
+{% block title %}Session proposals for Spark Camp {{ camp.theme }}{% endblock %}
+
+{% block pageheader %}{{ sessions|length }} session proposal{{ sessions|length|pluralize }} found{% endblock %}
+
+{% block content %}
+<section class="content">
+
+    {% if sessions %}
+            <table class="table table-basic" id="invites-table">
+                <thead>
+                    <tr>
+                        <th>Invite No.</th>
+                        <th>First name</th>
+                        <th>Last name</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>                        
+            {% for session in sessions %}
+                <tr>
+                    <td><a href="{{ session.url }}">{{ session.rand_id }}</a></td>
+                    <td>{{ session.first_name }}</td>
+                    <td>{{ session.last_name }}</td>
+                    <td>{{ session.title }}</td>
+                    <td>{{ session.description }}</td>
+                </tr>
+            {% endfor %}
+            </table>
+        
+    {% else %}
+        <p class="text-large">No session proposals found.</p>
+    {% endif %}
+</section>
+{% endblock %}

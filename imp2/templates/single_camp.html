@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Invitations for {{ camp.theme }}{% endblock %}
+
+{% block pagestyles %}
+    th.headerSortUp {
+        background-color: #f3edd2;
+    }
+    
+    th.headerSortDown {
+        background-color: #d9edf7;
+    }
+{% endblock %}   
+
+{% block overline %}<div class="overline-alt">Spark {{ camp.theme }}</div>{% endblock %}
+{% block pageheader %}{{ invitations|length }} invitation{{ invitations|length|pluralize }} found{% endblock %}
+
+{% block content %}
+<section class="content">
+        {% if invitations %}
+            <div class="tile-mod-4">
+                <div class="media-block">
+                    <h3 class="h3"><span class="orange">{{ confirmed|length }}</span> / {{ invitations|length }}</h3>
+                    <p class="text-med">confirmed</p>
+                </div>
+                <div class="media-block">
+                    <h3 class="h3"><span class="orange">{{ percent_women }}</span> / {{ percent_all_women }}</h3>
+                    <p class="text-med">% women</p>
+                </div>
+                <div class="media-block">
+                    <h3 class="h3"><span class="orange">{{ percent_poc }}</span> / {{ percent_all_poc }}</h3>
+                    <p class="text-med">% POC</p>
+                </div>
+                <div class="media-block">
+                    <h3 class="h3"><span class="orange">{{ percent_journos }}</span> / {{ percent_all_journos }}</h3>
+                    <p class="text-med">% journalists</p>
+                </div>
+            </div>
+            <table class="table table-basic" id="invites-table">
+                <thead>
+                    <tr id="invites-header" title="Click header to sort. Hold shift to sort on multiple columns.">
+                        <th>Invite No.</th>
+                        <th>First name</th>
+                        <th>Last name</th>
+                        <th>Status</th>
+                        <th>Stipend</th>
+                        <th>Roommate</th>
+                        <th>Ignite</th>
+                        <th>Expires</th>
+                    </tr>
+                </thead>                        
+            {% for invite in invitations %}
+                <tr>
+                    <td><a href="{% url 'route_registration' invite.rand_id %}">{{ invite.rand_id }}</a></td>
+                    <td>{{ invite.user.first_name }}</td>
+                    <td>{{ invite.user.last_name }}</td>
+                    <td>{{ invite.status }}</td>
+                    <td>{% if invite.stipend %}<a href="{% url 'invite_related' rand_id=invite.rand_id main_object='Stipend' %}">Yes</a>{% endif %}</td>
+                    <td>{% if invite.roommate %}<a href="{% url 'invite_related' rand_id=invite.rand_id main_object='Roommate' %}">Yes</a>{% endif %}</td>
+                    <td>{% if invite.ignite %}<a href="{% url 'invite_related' rand_id=invite.rand_id main_object='Ignite' %}">Yes</a>{% endif %}</td>
+                    <td>{{ invite.expires }}</td>
+                </tr>
+            {% endfor %}
+            </table>
+        {% else %}
+            <p class="text-large">No invitations for this camp have been entered yet. <a href="/admin/rsvp/invitation/add/">Add some invitations from the admin.</a></p>
+        {% endif %}
+</section>
+{% endblock %}
+
+{% block extranav %}
+<section class="content">
+
+{% if camp.spreadsheet_url %}
+<div class="sidebar-mod">
+<form class="form-basic comment-form" action="{% url 'google_sync' camptheme=camp.theme %}" method="get">
+<h4 class="h5">Google Spreadsheet sync</h4>
+<fieldset class="inputs">
+    <label for="deadline">Days till deadline:</label>
+    <input type="text" class="input" value="14" name="deadline"><input class="btn" type="submit" value="Submit" />
+</fieldset>
+</form>
+</div>
+{% endif %}
+{% if camp.mailchimp_list %}
+<div class="sidebar-mod">
+<h4 class="h5"><a href="{% url 'mailsync' camptheme=camp.theme %}">Sync with MailChimp</a></h4>
+</div>
+{% endif %}
+</section>
+{% endblock %}
+
+{% block adminnav %}
+    <li><a href="{% url 'single_camp' camptheme=camp.theme %}">&nbsp;- {{ camp.theme }}</a></li>
+    <li><a href="{% url 'dietary' camptheme=camp.theme %}">&nbsp;&nbsp;&nbsp;- Dietary preferences</a></li>
+    <li><a href="{% url 'stipends' camptheme=camp.theme %}">&nbsp;&nbsp;&nbsp;- Stipend requests</a></li>
+    <li><a href="{% url 'sessions' camptheme=camp.theme %}">&nbsp;&nbsp;&nbsp;- Session proposals</a></li>
+    <li><a href="{% url 'camp_table' camptheme=camp.theme %}">&nbsp;&nbsp;&nbsp;- Data table</a></li>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ STATIC_URL }}_js/jquery.tablesorter.min.js"></script>
+<script src="{{ STATIC_URL }}_js/bootstrap-tooltip.js"></script>
+
+<script type="text/javascript">
+ $(document).ready(function() {
+    $("#invites-table").tablesorter({
+      sortList: [[3,0],[2,0]]
+    });
+    $("#invites-header").tooltip();
+  });
+</script>
+{% endblock %}

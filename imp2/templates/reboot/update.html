@@ -1,0 +1,57 @@
+{% extends "reboot/pay.html" %}
+
+  {% block title %}{{ invitation.camp.display_name }} – Update Your Profile{% endblock %}
+
+  {% block leftcolumn %}
+  
+  {% if messages %}
+    {% for message in messages %}
+    <div class="alert{% if message.tags %} alert-{{ message.tags }}{% endif %} alert-dismissible" role="alert">
+      <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+      {{ message }}
+    </div>
+    {% endfor %}
+  {% endif %}
+
+  {% if invitation.status == 'I' %}
+
+    <h3>{{ invitation.user.first_name }}, your spot is reserved.</h3>
+    <p><strong>To complete your registration</strong>, please make sure everything below is up-to-date.</p>
+
+  {% elif invitation.status == 'W' %}
+
+    <h3>{{ invitation.user.first_name }}, we have you on the waitlist.</h3>
+    <p><strong>We'll let you know as soon as we determine whether we can accommodate you at {{ invitation.camp.display_name }}.</strong> Meanwhile, please make sure everything below is up-to-date.</p>
+
+  {% elif invitation.status == 'Y' %}
+
+    <ol class="breadcrumb">
+      <li><a href="{% url 'details' rand_id=invitation.rand_id %}">Back</a></li>
+      <li class="active">Update your profile</li>
+    </ol>
+
+    <h3>{{ invitation.user.first_name }}, we're thrilled you'll be joining us.</h3>
+    <p>Please make sure everything below is up-to-date.</p>
+    
+  {% else %}
+
+    <h3>Register for {{ invitation.camp.display_name}}.</h3>
+    <p>Look over the items below and make sure everything is tip-top.</p>
+
+  {% endif %}
+
+    <p><span class="text-danger">
+      {% if not invitation.user.sparkprofile.headshot %}We need a headshot of you to finish your registration. Please upload a clear, high-resolution photo of yourself below. {% endif %}
+      {% if invitation.user.sparkprofile.bio == '' %} We're missing a bio for you; please submit a brief bio below.{% endif %}
+    </span></p>
+
+    <form action="{% url 'update' rand_id=invitation.rand_id %}" method="post" enctype="multipart/form-data" class="form-horizontal">
+      {% csrf_token %}
+      <table class="table table-basic">
+      {{ profileform }}
+      </table>
+      <div class="well text-center">
+        <input class="btn btn-success" type="submit" value="Submit" />
+      </div>
+    </form>
+  {% endblock leftcolumn %}

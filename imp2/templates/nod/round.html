@@ -1,0 +1,154 @@
+{% extends "nod/vote.html" %}
+
+  {% block title %}{{ round.camp.display_name }} – {{ round.short_name }}{% endblock title %}
+
+  {% block admin-navitems %}
+  <li><a href="{% url 'camp' camptheme=round.camp.theme %}">Event dashboard</a></li>
+  <li><a href="{% url 'admin:rsvp_camp_change' round.camp.id %}">Edit event</a></li>
+  <li><a href="{% url 'admin:nod_votinground_change' round.id %}">Edit round</a></li>
+  {% endblock admin-navitems %}
+
+  {% block pageheader %}
+    <h1>{{ all_picks|length }} nominees</h1>
+  {% endblock pageheader %}
+  
+  {% block main %}
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-5">
+            <p class="lead">{{ round.short_name|lower }} for {{ round.camp.display_name }}</p>
+            <p class="text-muted">Click any header in the table below to sort by that column. Hold shift while clicking to sort on multiple columns.</p>
+        </div>
+        <div class="col-lg-3">
+        {% if your_picks %}
+          <p>your votes / all votes</p>
+          <p>{{ percents.your_poc }}% POC / <span class="text-muted">{{ percents.poc }}% POC</span></p>
+          <p>{{ percents.your_women }}% women / <span class="text-muted">{{ percents.women }}% women</span></p>
+        {% else %}
+          <p>You haven't cast any votes in this round as yet. <a href="{% url 'vote' round=round.id %}">Vote!</a></p>
+        {% endif %} 
+        </div>
+        <div class="col-lg-4">
+          <p><span class="glyphicon glyphicon-flag"></span>&nbsp;<a href="{% url 'vote' round.id %}">Vote again</a></p>
+          <p><span class="glyphicon glyphicon-check"></span>&nbsp;Select: <a id="2plus">2+ votes</a> | <a id="3plus">3+ votes</a> | <a id="unselect">none</a></p>
+          <p><span class="glyphicon glyphicon-tasks"></span>&nbsp;<a id="countchecked">Count selected</a></p>
+        </div>            
+      </div>
+    </div>
+
+      <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                {% if all_picks %}
+                    <div class="table-responsive">
+                    <form action="{% url 'invites' camptheme=round.camp.theme %}" method="POST">
+                        {% csrf_token %}
+                    <table class="table table-bordered" id="vote-table">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="check_all" /></th>
+                                <th>Votes</th>
+                                <th>First name</th>
+                                <th>Last name</th>
+                                <th>Company</th>
+                                <th>Title</th>
+                                <th>Bio</th>
+                                <th>Email</th>
+                                <th>POC</th>
+                                <th>W</th>
+                                <th>J</th>
+                            </tr>
+                        </thead>
+                    {% for pick in all_picks %}
+                        <tr>
+                            <td><input type="checkbox" name="invite" class="invite-check{% if pick.value > 1 %} 2plus{% endif %}{% if pick.value > 2 %} 3plus{% endif %}" value="{{ pick.id }}" /></td> 
+                            <td>{{ pick.value }}</td>
+                            <td>{{ pick.first_name }}</td>
+                            <td>{{ pick.last_name }}</td>
+                            <td>{{ pick.sparkprofile.employer }}</td>
+                            <td>{{ pick.sparkprofile.job_title }}</td>
+                            <td>{{ pick.sparkprofile.bio }}</td>
+                            <td{% if not pick.email %} class="bg-warning"{% endif %}>{{ pick.email }}</td>
+                            <td>{% if pick.sparkprofile.poc %}<span class="glyphicon glyphicon-ok"></span>{% endif %}</td>
+                            <td>{% if pick.sparkprofile.woman %}<span class="glyphicon glyphicon-ok"></span>{% endif %}</td>
+                            <td>{% if pick.sparkprofile.journo %}<span class="glyphicon glyphicon-ok"></span>{% endif %}</td>
+                        </tr>
+                    {% endfor %}
+                    </table>
+                    </div>
+                {% else %}
+                    <h3>No votes yet for this round.</h3>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-default navbar-fixed-bottom">
+        <div class="container">
+            <div class="navbar-form navbar-right">
+                <label for="deadline" class="navbar-text" />Days till deadline:</label>
+                <input type="text" class="form-control" name="deadline" value="14" />
+                <input type="submit" class="btn btn-info navbar-right" value="Invite!" id="nodsubmit" />
+            </div>
+        </div>
+    </nav>        
+    </form>
+    {% endblock main %}
+
+    {% block customscripts %}
+    <script src="{{ STATIC_URL }}_js/jquery.tablesorter.mod.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $("#vote-table").tablesorter({
+          sortList: [[1,1],[8,1],[9,1],[3,0],[2,0]],
+          headers: { 0: { sorter: false}, },
+          cssDesc: 'active',
+          cssAsc: 'danger',
+        });
+        function checkcount(selector) {
+            selector = typeof selector !== 'undefined' ? selector : 'a#countchecked';
+            var countchecked = $('input.invite-check:checked').size();
+            var noemail = $('input.invite-check:checked').parents('tr').children('td.bg-warning').size();
+            $(selector).text(countchecked + ' nominees selected; ' + noemail + ' lack emails');
+        };
+        function unselect() {
+            $('input.invite-check').each(function(){
+                this.checked = false;
+            })
+            checkcount();
+        };
+        $('#check_all').click(function(event) {  //on click 
+            if(this.checked) { // check select status
+                $('input.invite-check').each(function() { //loop through each checkbox
+                    this.checked = true;  //select all checkboxes with class "checkbox1"               
+                });
+            }else{
+                $('input.invite-check').each(function() { //loop through each checkbox
+                    this.checked = false; //deselect all checkboxes with class "checkbox1"                       
+                });         
+            }
+            checkcount();
+        });
+        $('#2plus').click(function(event) { 
+            unselect();
+            $('input.2plus').each(function() {
+                this.checked = true;
+            })
+            checkcount();
+        });
+        $('#3plus').click(function(event) { 
+            unselect();
+            $('input.3plus').each(function() {
+                this.checked = true;
+            })
+            checkcount();
+        });
+        $('a#countchecked').click(function(event){
+            checkcount(this);
+        });
+        $('a#unselect').click(function(event){
+            unselect();
+        });
+      });
+    </script>
+    {% endblock customscripts %}

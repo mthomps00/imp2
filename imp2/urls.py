@@ -24,35 +24,35 @@ from django.urls import path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-#    url(r'^$', dashboard, name="dashboard"), # lists upcoming and recent camps
-#    url(r'^camp/(?P<camptheme>[a-zA-Z-,& ]+)/$', include([
-#        url(r'^$', camp, name="camp"), # camp dashboard
+    url(r'^$', dashboard, name="dashboard"), # lists upcoming and recent camps
+    url(r'^camp/(?P<camptheme>[a-zA-Z-,& ]+)/', include([
+        url(r'^$', camp, name="camp"), # camp dashboard
 #        url(r'^detail/$', campdetail, name="campdetail"), # camp dashboard
 #        url(r'^contacts/$', contacts, name="contacts"), # one-on-one contacts
 #        url(r'^mailchimp/setup/$', mailcamp, name="mailcamp"), # setup camp in MailChimp
 #        url(r'^mailchimp/sync/$', mailsync, name="mailsync"), # sync invites with MailChimp
 #        url(r'^csv/$', camp_table, name="camp_table"), # CSV of all camp invitees
-#        ])),
+        ])),
 #    url(r'^usercsv/$', user_table, name="user_table"), # CSV of all users
-#    url(r'^route/(?P<rand_id>\d{8})/$', include([
-#        url(r'^$', route, name="route"), # routes incoming users based on invitation status
+    url(r'^route/(?P<rand_id>\d{8})/', include([
+        url(r'^$', route, name="route"), # routes incoming users based on invitation status
 #        url(r'^(?P<rand_id>\d{8})/faq/$', faq, name="faq"), #faq
-#        ])),
-#    url(r'^rsvp/(?P<rand_id>\d{8})/$', include([
-#        url(r'^$', invite, name="invite"), # first landing page for invitees
-#        url(r'^pay/$', pay, name="pay"), # processes payment for camp registration
-#        url(r'^update/$', update, name="update"), # allows invitees to update profile information and complete registration
-#        url(r'^details/$', details, name="details"), # landing page for confirmed attendees
+        ])),
+    url(r'^rsvp/(?P<rand_id>\d{8})/', include([
+        url(r'^$', invite, name="invite"), # first landing page for invitees
+        url(r'^pay/$', pay, name="pay"), # processes payment for camp registration
+        url(r'^update/$', update, name="update"), # allows invitees to update profile information and complete registration
+        url(r'^details/$', details, name="details"), # landing page for confirmed attendees
 #        url(r'^stipend/$', stipend, name="stipend"), # stipend request form
-#        url(r'^cancel/$', cancel, name="cancel"), # registration cancellation page
+        url(r'^cancel/$', cancel, name="cancel"), # registration cancellation page
 #        url(r'^confirm_cancel/$', confirm_cancel, name="confirm_cancel"), # registration cancellation confirmation
-#        url(r'^restore/$', restore, name="restore"), # allows users who've canceled or refused to request waitlisting
-#        url(r'^confirm_restore/$', confirm_restore, name="confirm_restore"), # waitlist request confirm
+        url(r'^restore/$', restore, name="restore"), # allows users who've canceled or refused to request waitlisting
+        url(r'^confirm_restore/$', confirm_restore, name="confirm_restore"), # waitlist request confirm
 #        url(r'^waitlist/$', waitlist, name="waitlist"), # landing page for waitlisted users
-#        url(r'^(?P<main_object>\w+)/signup/$', signup, name="signup"), # allows users to sign up for roommates, ignite talks, etc.
-#        url(r'^(?P<main_object>\w+)/signdown/$', signdown, name="signdown"), # allows users to cancel roommate/ignite/etc signups
-#        url(r'^(?P<main_object>\w+)/(?P<object_id>\d+)/delete/$', delete_signup, name="delete_signup"), # confirmation of cancellation
-#        ])),
+        url(r'^(?P<main_object>\w+)/signup/$', signup, name="signup"), # allows users to sign up for roommates, ignite talks, etc.
+        url(r'^(?P<main_object>\w+)/signdown/$', signdown, name="signdown"), # allows users to cancel roommate/ignite/etc signups
+        url(r'^(?P<main_object>\w+)/(?P<object_id>\d+)/delete/$', delete_signup, name="delete_signup"), # confirmation of cancellation
+        ])),
 
     # Nod views
 #    url(r'^search/$', search, name="search"), # generic search of all users

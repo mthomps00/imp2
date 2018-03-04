@@ -1,0 +1,120 @@
+{% extends "reboot/reboot.html" %}
+
+  {% block title %}{{ camp.display_name }} – Dashboard{% endblock title %}
+
+  {% block admin-navitems %}
+    <li><a href="{% url 'camp' camptheme=camp.theme %}">Event dashboard</a></li>
+    <li><a href="{% url 'admin:rsvp_camp_change' camp.id %}">Edit event</a></li>
+    {% block admin-invite-navitems %}{% endblock admin-invite-navitems %}
+  {% endblock admin-navitems %}
+
+  {% block pageheader %}
+  <h1>{{ camp.display_name }} <small>About this event</small></h1>
+  {% endblock pageheader %}
+  
+  {% block main %}
+  {% if invitations %}
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-6">
+        <p class="lead">{{ camp.description }}</p>
+        <p class="text-muted">Click any header in the table below to sort by that column. Hold shift while clicking to sort on multiple columns.</p>
+      </div>
+      <div class="col-lg-2">
+        <p>{{ confirmed|length }} confirmed /
+          <span class="text-muted">{{ invitations|length }} total</span>
+        </p>
+        <p>{{ percent_women }}% /
+          <span class="text-muted">{{ percent_all_women }}% women</span>
+        </p>
+        <p>{{ percent_poc }}% /
+          <span class="text-muted">{{ percent_all_poc }}% POC</span>
+        </p>
+        <p>{{ percent_journos }}% /
+          <span class="text-muted">{{ percent_all_journos }}% media</span>
+        </p>
+      </div>
+      <div class="col-lg-4">
+      
+      {% comment "Suspend MailChimp functionality" %}  
+        {% if not camp.mailchimp_list %}
+        <p><span class="glyphicon glyphicon-save-file"></span>&nbsp;<a href="{% url 'mailcamp' camptheme=camp.theme %}">Set up camp in MailChimp</a></p>
+        {% else %}
+        <p><span class="glyphicon glyphicon-transfer"></span>&nbsp;<a href="{% url 'mailsync' camptheme=camp.theme %}">Sync with MailChimp</a> | <a href="{% url 'mailcamp' camptheme=camp.theme %}">View merge tags</a></p>
+        {% endif %}
+      
+        <p><span class="glyphicon glyphicon-file"></span>&nbsp;<a href="{% url 'camp_table' camptheme=camp.theme %}">Download CSV of invitees</a> | <a href="{% url 'campdetail' camptheme=camp.theme %}">Invitee details</a></p>
+        <p><span class="glyphicon glyphicon-envelope"></span>&nbsp;<a href="{% url 'contacts' camptheme=camp.theme %}">View your contacts</a></p>
+        <p><span class="glyphicon glyphicon-list"></span>&nbsp;<a href="{% url 'invites' camptheme=camp.theme %}">Edit users and invitations</a></p>
+          <p><span class="glyphicon glyphicon-flag"></span>&nbsp;Voting rounds: {% for round in camp.votinground_set.all %}
+              {% if not forloop.last %}<a href="{% url 'round' round.id %}">{{ forloop.counter }}</a>&nbsp;|&nbsp;{% else %}
+              <a href="{% url 'vote' round.id %}">{{ forloop.counter }}</a>{% endif %}{% endfor %}
+      {% endcomment %}
+      </div>
+    </div>
+  </div>
+
+
+  <!-- DATA ABOUT INVITATIONS -->
+  <div class="container">
+    <div class="table-responsive">
+      <table class="table table-striped table-condensed table-bordered" id="invites-table">
+        <thead>
+          <tr id="invites-header">
+            <th>Invite No.<span class="pull-right text-muted"><small>Edit</small></span></th>
+            <th>First name</th>
+            <th>Last name<span class="pull-right text-muted"><small>Edit</small></span></th>
+            <th>Status</th>
+            {% if camp.paid %}<th>Paid</th>{% endif %}
+            {% if camp.stipends %}<th>Stipend</th>{% endif %}
+            <th>Roommate</th>
+            {% if camp.ignite %}<th>Ignite</th>{% endif %}
+            <th>Expires</th>
+          </tr>
+        </thead>                        
+        {% for invite in invitations %}
+        <tr>
+          <td><a href="{% url 'route' invite.rand_id %}">{{ invite.rand_id }}</a>&nbsp;<a href="{% url 'admin:rsvp_invitation_change' invite.id %}" alt="Edit invitation"><span class="glyphicon glyphicon-pencil pull-right"></span></a></td>
+          <td>{{ invite.user.first_name }}</td>
+          <td>{{ invite.user.last_name }}&nbsp;<a href="{% url 'admin:auth_user_change' invite.user.id %}" alt="Edit user" title="Edit user"><span class="glyphicon glyphicon-user pull-right"></span></a></td>
+          <td>{{ invite.status }}</td>
+          {% if camp.paid %}
+          <td style="text-align: center">{% if invite.has_paid or invite.comp_ticket %}<span class="glyphicon glyphicon-ok"></span>{% endif %}</td>
+          {% endif %}
+          {% if camp.stipends %}
+          <td style="text-align: center">{% if invite.stipend %}<a href="{% url 'stipend' rand_id=invite.rand_id %}"><span class="glyphicon glyphicon-ok"></span></a>{% endif %}</td>
+          {% endif %}
+          <td style="text-align: center">{% if invite.roommate %}<a href="{% url 'signup' rand_id=invite.rand_id main_object='Roommate' %}"><span class="glyphicon glyphicon-ok"></span></a>{% endif %}</td>
+          {% if camp.ignite %}
+          <td style="text-align: center">{% if invite.ignite %}<a href="{% url 'signup' rand_id=invite.rand_id main_object='Ignite' %}"><span class="glyphicon glyphicon-ok"></span></a>{% endif %}</td>
+          {% endif %}
+          <td>{{ invite.expires }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+
+    </div>
+  </div>
+
+  {% else %}
+  <div class="container">
+    <div class="row">
+      <h3>No invitations for this camp have been entered yet.</h3>
+      <p><a href="/admin/rsvp/invitation/add/">Add some invitations from the admin.</a></p>
+    </div>
+  </div>
+  {% endif %}
+  {% endblock main %}
+    
+  {% block customscripts %}
+    <script src="{{ STATIC_URL }}_js/jquery.tablesorter.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $("#invites-table").tablesorter({
+          sortList: [[3,0],[2,0]],
+          cssDesc: 'active',
+          cssAsc: 'danger',
+        });
+      });
+    </script>
+  {% endblock customscripts %}

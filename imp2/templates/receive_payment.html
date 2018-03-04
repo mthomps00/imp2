@@ -1,0 +1,48 @@
+{% extends "registration_complete.html" %}
+
+{% block title %}Spark Camp: Payment confirmed{% endblock %}
+{% block pageheader %}We're so glad you're coming. Now, <span class="orange">complete your registration.</span>{% endblock %}
+
+
+{% block leftcolumn %}
+
+{% if error %}
+    <h1 class="h1">We're sorry, there was an error with your payment.</h1>
+    <p class="text-med">{{ error.message }} Please double-check your information and try again. If you experience any more trouble, email us at <a href="mailto:rsvp@sparkcamp.com" class="orange">rsvp@sparkcamp.com</a>.</p>
+<form action="{% url 'receive_payment' invitation.rand_id %}" method="POST">
+    {% csrf_token %}
+    <script
+        src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+        data-key="{{ invitation.key }}"
+        data-amount="{{ invitation.cost }}"
+        data-name="{{ invitation.camp.theme }}"
+        data-description="Try again"
+        data-label="Try again"
+    </script>
+    <input type="hidden" name="rand_id" value="{{ invitation.rand_id }}" />
+</form>
+{% else %}
+    
+    <h1 class="h1">Yay, your spot is reserved!</h1>
+    <h1 class="h1 orange">Now complete your registration.</h1>
+    <p class="text-med">Here's the information we have on file for you. {% if not invitation.user.sparkprofile.has_headshot %}We don't yet have a headshot; please email a clear, hi-res photo of yourself to <a href="mailto:sparkcampphotos@gmail.com" class="orange">sparkcampphotos@gmail.com</a>, and check the 'Headshot sent' box below.{% endif %}{% if invitation.user.sparkprofile.bio == '' %} We're missing a bio for you; please submit one below.{% endif %} Please make sure everything here is up-to-date:</p>
+    <form class="well" action="{% url 'registration_complete' rand_id=invitation.rand_id %}" method="post">{% csrf_token %}
+    <table class="table table-basic">
+    {{ profileform.as_table }}
+    </table>
+        <input class="submit btn-large" type="submit" value="Submit" />
+    </form>
+
+{% endif %}
+
+<p class="text">&nbsp;</p>
+<p class="text">&nbsp;</p>
+<p class="text">&nbsp;</p>
+{% endblock leftcolumn %}
+
+{% block rightcolumn %}
+<h4 class="h4">Can't make it?</h4>
+<p class="text">If you won't be able to make it to Spark Camp after all, please let us know as early as possible. After XXXXX, most of the costs of your attendance have already been incurred, and we can only issue a partial refund.</p>
+<input type="submit" class="submit btn-large" value="Cancel my ticket" />
+
+{% endblock rightcolumn %}
